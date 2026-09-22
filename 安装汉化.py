@@ -240,35 +240,32 @@ def step4_gcl(game, pairs):
     merged.update(COMPACT)
     merged.update(load_override())
     gcl = os.path.join(game, "bin", "game.gcl")
-    data = bytearray(open(gcl, "rb").read())
-    orig = bytes(data)
+    raw = open(gcl, "rb").read()
+    data = bytearray(raw)
+    lookup = {en.encode(): zh.encode() for en, zh in merged.items() if zh.strip()}
+    print(f"  gcl: 单遍扫描 81MB（{len(lookup)} 词条），请勿关闭窗口…")
     patched = skipped = 0
-    for en in sorted(merged, key=len, reverse=True):
-        eb, zb = en.encode(), merged[en].encode()
-        i = found = 0
-        while True:
-            i = data.find(eb, i)
-            if i < 0:
-                break
-            j = i + len(eb)
-            b_ok = i == 0 or not chr(data[i - 1]).isalnum()
-            a_ok = j >= len(data) or not chr(data[j]).isalnum()
-            if b_ok and a_ok:
-                budget = budget_at(data, i, j)
-                if len(zb) > budget:
+    i, n = 0, len(data)
+    next_mile = n // 10
+    while i < n:
+        j = data.find(b"\x00", i)
+        if j < 0:
+            j = n
+        if j > i:
+            zb = lookup.get(bytes(data[i:j]))
+            if zb is not None:
+                if len(zb) <= j - i:
+                    data[i:j] = zb + b"\x00" * (j - i - len(zb))
+                    patched += 1
+                else:
                     skipped += 1
-                    i = j
-                    continue
-                data[i:i + budget] = zb + b"\x00" * (budget - len(zb))
-                found += 1
-                i += budget
-            else:
-                i += 1
-        if found:
-            patched += 1
-    assert len(data) == len(orig), "gcl 大小变化！"
+        i = j + 1
+        if i > next_mile:
+            print(f"    … {i * 100 // n}%")
+            next_mile += n // 10
+    assert len(data) == len(raw), "gcl 大小变化！"
     open(gcl, "wb").write(bytes(data))
-    print(f"  gcl: 替换 {patched} 词条（超预算跳过 {skipped}），大小不变")
+    print(f"  gcl: 替换 {patched} 词条（译超长跳过 {skipped}），大小不变")
 
 
 def backup(game, bid):
@@ -297,7 +294,35 @@ def backup(game, bid):
     print(f"已备份原始文件 → {bdir}")
 
 
+class _Tee:
+    """stdout 同步写入安装日志，便于事后排查（控制台一闪而过也有据可查）。"""
+    def __init__(self, path):
+        import datetime
+        self.fh = open(path, "a", encoding="utf-8")
+        self.fh.write(f"\n==== {datetime.datetime.now():%Y-%m-%d %H:%M:%S} ====\n")
+    def __enter__(self):
+        outer = self
+        class W:
+            def write(s, t):
+                outer.old.write(t)
+                outer.fh.write(t)
+            def flush(s):
+                outer.old.flush()
+                outer.fh.flush()
+        self.old = sys.stdout
+        sys.stdout = W()
+        return self
+    def __exit__(self, *a):
+        sys.stdout = self.old
+        self.fh.close()
+
+
 def cmd_install():
+    with _Tee(os.path.join(here(), "安装日志.txt")):
+        _do_install()
+
+
+def _do_install():
     if game_running():
         sys.exit("游戏正在运行，请先退出。")
     game, acf = find_game()
@@ -314,7 +339,12 @@ def cmd_install():
     step3_json(game, pairs)
     print("④ gcl 内嵌串替换")
     step4_gcl(game, pairs)
-    print("完成。启动游戏验证；卸载用 uninstall。")
+    print()
+    print("=" * 46)
+    print("安装完成！启动游戏验证中文显示。")
+    print("若界面仍为英文或游戏异常：把 exe 旁的 安装日志.txt")
+    print("发给维护者，或选 3 卸载还原。")
+    print("=" * 46)
 
 
 def cmd_status():
@@ -340,6 +370,11 @@ def cmd_status():
 
 
 def cmd_uninstall():
+    with _Tee(os.path.join(here(), "安装日志.txt")):
+        _do_uninstall()
+
+
+def _do_uninstall():
     if game_running():
         sys.exit("游戏正在运行，请先退出。")
     game, acf = find_game()
