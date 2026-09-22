@@ -1,0 +1,19 @@
+类型,键,中文
+gcl,Drag Person,拖人
+name,black_bear,黑熊
+name,compass_sensor,罗盘传感器
+name,electric_relay,电力继电器
+name,mask,面罩
+name,military_mask,防毒面具
+name,rope,绳索
+name,binoculars,望远镜
+name,chef_skullcap,厨师帽
+name,scrubs_hat,手术帽
+name,hi_vis_overalls,高可视工作服
+name,disposable_coveralls,一次性防护服
+tsv,binding_axis_flight_axis_1,横滚
+tsv,tooltip_roll_rotation_axis,横滚
+tsv,rebind_press_key_to_rebind,按下按键重新绑定
+tsv,rebind_press_key_mouse_button_to_rebind,按下按键或鼠标按钮重新绑定
+tsv,manual_1,在极端事件（如大流行、自然灾害或战争）发生时，生存是你的首要任务。确保有住所、合适的衣物、水和食物。如果你感到自身安全受到威胁，武器和弹药也是必不可少的。
+tsv,manual_55,旅行时，请留意天气变化和日照时长，因为恶劣的条件会让最简单的任务也变成巨大的挑战。

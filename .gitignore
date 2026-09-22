@@ -1,0 +1,8 @@
+# 安装器运行残留（勿提交）
+备份_*/
+备份_tsv/
+__pycache__/
+*.spec
+build/
+dist/
+*.log

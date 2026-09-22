@@ -1,0 +1,19 @@
+{
+  "name": "Anymaker 简中汉化包",
+  "app_id": "4435340",
+  "game": "Anymaker (Steam Early Access, Geometa)",
+  "repo": "https://github.com/EC90/anymaker-zh-patch",
+  "tested_builds": ["25422107", "25436400"],
+  "entry_script": "安装汉化.py",
+  "entry_exe": "anymaker-zh-installer.exe",
+  "commands": {
+    "install": "python 安装汉化.py install",
+    "status": "python 安装汉化.py status",
+    "uninstall": "python 安装汉化.py uninstall"
+  },
+  "requires": "Windows + 已安装 Anymaker；Python 3.8+（或使用 exe 免 Python）",
+  "prereq_game_not_running": true,
+  "rollback": ["uninstall 子命令", "Steam 验证文件完整性"],
+  "update_resilient": true,
+  "contains_game_content": false
+}
