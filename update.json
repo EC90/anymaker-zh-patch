@@ -1,0 +1,9 @@
+{
+  "version": "1.0.3",
+  "date": "2026-09-22",
+  "notes": "新增：启动自动检查更新 + 词典在线更新（SHA-256 校验）+ 菜单4手动检查",
+  "dict_url": "https://raw.githubusercontent.com/EC90/anymaker-zh-patch/main/%E6%B6%A6%E8%89%B2%E8%AF%8D%E5%85%B8.csv",
+  "dict_mirror": "https://cdn.jsdelivr.net/gh/EC90/anymaker-zh-patch@main/%E6%B6%A6%E8%89%B2%E8%AF%8D%E5%85%B8.csv",
+  "dict_sha256": "89303ad80b85f3f83057f2fcf73cb686c11ba2532d10a9e50de147c134077ca8",
+  "release_url": "https://github.com/EC90/anymaker-zh-patch/releases/latest"
+}

@@ -15,12 +15,14 @@
   python 安装汉化.py uninstall  # 从备份完整还原
 """
 import csv
+import hashlib
 import json
 import os
 import re
 import shutil
 import subprocess
 import sys
+import urllib.request
 import winreg
 
 APP_ID = "4435340"
@@ -34,6 +36,9 @@ MANUAL = {'Bloom Intensity': '泛光强度', 'Bloom Threshold': '泛光阈值', 
 COMPACT = {'Exit to Main Menu': '回到主菜单', 'Save Game': '存档', 'Load Game': '读档', 'TOOLTIP DETAIL': '提示详细', 'SAVING GAME...': '保存中...', 'STEERING SENS.': '转向灵敏', 'Reset to Default': '恢复默认', 'MULTIPLAYER HOST': '建立主机', 'CLIENT DESTROYED': '客户端断开', 'PAUSE MENU TOGGLE': '暂停菜单', 'TOGGLE FREE MOVE': '自由移动', 'Upload to Workshop': '上传到工坊', 'This game is full.': '游戏已满员', 'Any unsaved progress will be lost': '未保存的进度将会丢失', 'Press key to rebind': '按键重新绑定', 'Press gamepad button to rebind': '按手柄键重新绑定', 'Press key/mouse button to rebind': '按键或鼠标重新绑定', 'Select Logic Node': '选逻辑节点', 'Select Logic Link Node': '选择逻辑链接点', 'Add Edge to Plate': '加板材边缘', 'Find and equip a Wheel.': '找个车轮装上。', 'CREATING WORKSHOP ITEM...': '创建工坊物品中...', 'UPDATING WORKSHOP ITEM...': '更新工坊物品中...', 'DELETING WORKSHOP ITEM...': '删除工坊物品中...', 'Multiplayer': '联机', 'Creative Dome:': '创造穹顶', "Open the inventory, hover the Canned Beans you picked up and press '###' to drop it on the floor.": "打开物品栏，选中罐装豆，按 '###' 丢到地上。", "Open the inventory, hover the Water you picked up and press '###' to drop it on the floor.": "打开物品栏，选中水，按 '###' 丢到地上。", 'Play as though always in the creative dome. Free building, unlimited use of items, no zombies, no loot and no player damage. Unleash your creativitiy without worrying about survival.': '如同在创意穹顶中游玩：自由建造，物品无限使用，无僵尸与战利品，玩家不会受伤。尽情创造，无需担心生存。', 'Press ### on keyboard or ### on gamepad to cancel': '按键盘 ### 或手柄 ### 取消', "Press '###' while hovering the door to open it.": "把光标移到门上按 '###' 打开。", 'insert ### at index ### of list ###': '将###插入列表###索引###', 'remove from list ### at index ###': '删除列表###索引###处', 'item at index ### of list ###': '列表###索引###项', 'create parameter ### named ###': '创建参数###命名###', 'create member ### named ###': '创建成员###命名###', 'create output ### named ###': '创建输出###命名###', 'create input ### named ###': '创建输入###命名###', 'create ### named ###': '创建###命名###', 'add ### to list ###': '###加入列表###', 'set ### to ###': '设###为###', 'clear list ###': '清空 ###', 'GAME MENU': '菜单', 'New Game': '开局', 'Open Inventory': '物品栏', 'Programmable 1': '可编程键1', 'WINDOW MODE': '窗口化', 'ROTATE LEFT': '左旋转', 'ROTATE RIGHT': '右旋转', 'ROTATE DOWN': '下旋转', 'ROTATE UP': '上旋转', 'DELETE SAVE': '删存档', 'Start Drag': '拖拽', 'Swap Items': '交换', 'AUTOSAVES': '存档', 'NO FILTER': '无过滤', 'RECEIVING': '接收中', 'BELT NODE': '皮带点', 'Move the Game Manual to the hotbar.': '把游戏手册移到快捷栏。', 'Save name too short.': '名字太短。', 'Remove Logic Link': '移除逻辑链', 'Save Clipboard': '存剪贴板', 'Load from File': '从文件读', 'NODE ### SPEED': '节点###速', 'LEFT ROLL NODE': '左横滚点', 'GEAR 1 RATIO': '1档比', 'GEAR 2 RATIO': '2档比', 'GEAR 3 RATIO': '3档比', 'GEAR 4 RATIO': '4档比', 'GEAR 5 RATIO': '5档比', 'GEAR 6 RATIO': '6档比', 'GEAR 7 RATIO': '7档比', 'GEAR 8 RATIO': '8档比', 'Last Played': '最近玩', 'OIL QUALITY': '油品', 'LIQUID NODE': '液体点', 'BREECH NODE': '后膛点', 'BLADE COUNT': '叶片数', 'FLOW FACTOR': '流量值', 'GAME BANNED': '被封禁', 'PAINT TOOLS': '喷漆', 'SAVE SCRIPT': '存脚本', 'LOAD SCRIPT': '读脚本', 'Rotate Left': '左旋转', 'Rotate Down': '下旋转', 'Rotate Up': '上旋转', 'Unlock Axis': '解轴向', 'Lock Axis': '锁轴向', 'Cancel Drag': '取消拖', 'Change Mode': '切模式', 'Apply Paint': '应用漆', 'Remove Node': '删节点', 'Remove Edge': '删边缘', 'Add Edge': '加边', 'Drag Zombie': '拖僵尸', 'VALUE ###': '值 ###', 'New Save': '新建', 'NEW GAME': '开局', 'DUNGEONS': '地牢', 'GAMEPLAY': '玩法', 'FOG BLUR': '雾化', 'OCCUPIED': '占用', 'Sandbox:': '沙盒:', 'Use on Component': '用于部件', 'TOOLBAR RIGHT': '右工具栏', 'TOOLBAR LEFT': '左工具栏', 'Toolbar Right': '工具栏右', 'Toolbar Left': '工具栏左', 'Enter Name...': '命名...', 'THROTTLE NODE': '油门节点', 'CONNECTING...': '连接中...', 'ITEM UNLOCKED': '已解锁', 'Use on Target': '对目标用', 'Hold to Equip': '按住装备', 'Hold to Cover': '按住覆盖', 'Regenerate': '重生成', 'NO GEARBOX': '无变速', 'TRACK NODE': '履带点', 'BRAKE NODE': '制动点', 'PITCH NODE': '俯仰点', 'DATA NODE': '数据点', 'FUEL NODE': '燃料点', 'OIL NODE': '油点', 'SET PETROL': '设汽油', 'SET AIR': '设气', 'SET OIL': '设油', 'TILT PITCH': '倾俯仰', 'TILT YAW': '倾航', 'GEAR COUNT': '齿轮数', 'ONBOARDING': '引导', 'Raise Item': '举物品', 'Lower Item': '放物品', 'Enter Seat': '入座', 'Exit Seat': '离座', 'EXIT SEAT': '离座', 'Climb Rope': '爬绳', 'Grab Rope': '抓绳', 'Close Menu': '关菜单', 'Open Menu': '开菜单', 'Enter Grid': '进网格', 'Exit Grid': '出网格', 'Clear Slot': '清槽位', 'Stop Paint': '停绘制', 'PROGRAM 1': '编程1', 'PROGRAM 2': '编程2', 'PROGRAM 3': '编程3', 'COVERED': '覆盖', 'POWERED': '通电', 'DAMAGED': '损坏', 'Reason:': '原因:', 'PEDAL L': '踏板L', 'PEDAL R': '踏板R', 'SLOT 1': '槽1', 'SLOT 2': '槽2', 'SLOT 3': '槽3', 'Programmable 2': '编程键2', 'Programmable 3': '编程键3', 'TRIGGER NODE': '触发点', 'COOLANT NODE': '冷却点', 'CLUTCH NODE': '离合点', 'FOOD & DRINK': '饮食', 'Save to File': '存到文件', 'Add Waypoint': '加路径点', 'SAVE GAME': '存游戏', 'LOAD SAVE': '读存档', 'GAME OVER': '结束', 'RECORDING': '录音中', 'SEAT POSE': '坐姿', 'Step Over': '单步过', 'Step Out': '步出', 'Step In': '步入', 'Free Move': '自由移', 'Load Ammo': '装弹', 'INVERT X': 'X反转', 'INVERT Y': 'Y反转', 'SERVER': '服务', 'CAMERA': '相机', 'LOADED': '上膛', 'WORKSHOP': '工坊', 'Pull Pin': '拔销', 'Add Logic Link': '加逻辑链', 'MAX PLAYERS': '最多人', 'Use on Self': '对己用', 'Enter Mount': '进挂点', 'Exit Mount': '出挂点', 'Packet loss': '丢包率', 'Career Mode:': '职业:', 'New Career': '新职业', 'LOADING...': '载入...', 'Paint Cell': '绘单元', 'PROFILE': '档案', 'RELOAD': '换弹', 'Reload': '换弹', 'L PEDAL SENS.': '左踏灵敏', 'R PEDAL SENS.': '右踏灵敏', 'INCAPACITATED': '已失能', 'Begin Edge': '起边缘', 'Cancel Plate': '取消板', 'Add Plate': '加板材', 'Creative Dome': '创造穹顶', 'Smoke Grenade': '烟雾弹', 'Dead Drop': '藏匿点', 'Duplicate Tool': '复制工具', 'Legal Agreement': '法律协议', 'Inventory': '物品栏', 'Journal': '日志', 'Vehicle': '载具', 'Player': '玩家', 'Window': '窗口', 'Building': '建造', 'Sandbox': '沙盒', 'Activate': '启动', 'Cancel': '取消', 'Delete': '删除', 'Rotate': '旋转', 'Climb': '攀爬', 'Height': '高度', 'CHARACTER': '角色', 'INTERACT': '互动', 'THROTTLE': '油门', 'TEMPERATURE': '温度', 'PRESSURE': '压力', 'INSIGNIA': '徽章', 'QUALITY': '画质', 'SHADOWS': '阴影', 'VEHICLE': '载具', 'CONTENT': '内容', 'PLAYERS': '玩家', 'OUTPUT': '输出', 'BREECH': '后膛', 'BUTTON': '按钮', 'RADIUS': '半径', 'Definition': '定义', 'Toggle': '切换', 'Off': '关', 'Eat': '吃'}
 CREATURE_ZH = {'black_bear': '黑熊', 'bald_eagle': '白头海雕', 'opossum': '北美负鼠', 'alaska_mountain_goat': '阿拉斯加白山羊', 'alaska_reindeer': '阿拉斯加驯鹿', 'arctic_fox': '北极狐', 'bighorn_sheep': '大角羊', 'black_tailed_deer': '黑尾鹿', 'bobcat': '短尾猫', 'canada_goose': '加拿大雁', 'coyote': '郊狼', 'golden_eagle': '金雕', 'gray_fox': '灰狐', 'grizzly_bear': '灰熊', 'horned_puffin': '角嘴海雀', 'interior_wolf': '内陆狼', 'moose': '驼鹿', 'mountain_lion': '美洲狮', 'musk_ox': '麝牛', 'osprey': '鹗', 'peccary': '西貒', 'pileated_woodpecker': '北美黑啄木鸟', 'polar_bear': '北极熊', 'raccoon': '浣熊', 'red_fox': '赤狐', 'red_tailed_hawk': '红尾鵟', 'ringtail_cat': '环尾浣熊', 'roosevelt_elk': '罗斯福马鹿', 'spotted_owl': '斑点林鸮', 'turkey_vulture': '红头美洲鹫', 'white_shepherd': '白色牧羊犬', 'white_tailed_kite': '白尾鸢', 'monster_s': '怪物', 'monster_m': '怪物', 'monster_centipede': '蜈蚣', 'monster_burrower': '掘地者', 'monster_acid': '酸液怪', 'monster_crusher': '碾压者', 'monster_carrier': '携带者', 'monster_eel': '鳗怪', 'zombie_basic': '僵尸', 'zombie_fast': '僵尸', 'zombie_tank': '变异僵尸', 'zombie_acid': '变异僵尸', 'zombie_ambush': '变异僵尸', 'zombie_spawn': '变异僵尸'}
 KNOWN_BUILDS = ["25422107", "25436400"]
+VERSION = "1.0.3"
+UPDATE_JSON_URL = "https://raw.githubusercontent.com/EC90/anymaker-zh-patch/main/update.json"
+GITHUB_RELEASES = "https://github.com/EC90/anymaker-zh-patch/releases/latest"
 
 
 def here():
@@ -317,6 +322,81 @@ class _Tee:
         self.fh.close()
 
 
+def _version_tuple(v):
+    try:
+        return tuple(int(x) for x in str(v).split("."))
+    except Exception:
+        return (0,)
+
+
+def fetch_update_info():
+    req = urllib.request.Request(UPDATE_JSON_URL,
+                                 headers={"User-Agent": f"anymaker-zh-patch/{VERSION}"})
+    with urllib.request.urlopen(req, timeout=8) as r:
+        return json.loads(r.read().decode("utf-8"))
+
+
+def download_dict(info):
+    last_err = None
+    for url in (info.get("dict_url"), info.get("dict_mirror")):
+        if not url:
+            continue
+        try:
+            req = urllib.request.Request(url,
+                                         headers={"User-Agent": f"anymaker-zh-patch/{VERSION}"})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                data = r.read()
+            want = (info.get("dict_sha256") or "").lower()
+            got = hashlib.sha256(data).hexdigest()
+            if want and got != want:
+                raise RuntimeError(f"词典 SHA-256 校验不符（期望 {want[:12]}… 实得 {got[:12]}…），已放弃")
+            return data
+        except Exception as e:
+            last_err = e
+    raise RuntimeError(f"全部下载源失败：{last_err}")
+
+
+def do_update(interactive=True):
+    """检查汉化更新；有则询问并更新词典+重装。网络失败如实打印。返回 True=已更新。"""
+    try:
+        info = fetch_update_info()
+    except Exception as e:
+        print(f"⚠ 更新检查失败：无法连接 GitHub（{type(e).__name__}: {e}）")
+        print("  本次跳过更新检查，安装/卸载功能不受影响。")
+        return False
+    remote = str(info.get("version", "0"))
+    if _version_tuple(remote) <= _version_tuple(VERSION):
+        print(f"汉化已是最新（v{VERSION}，{info.get('date', '')}）")
+        return False
+    print(f"★ 发现汉化更新 v{remote}（当前 v{VERSION}）")
+    print(f"  更新说明：{info.get('notes', '')}")
+    print(f"  安装器新版本：{info.get('release_url', GITHUB_RELEASES)}（exe 本体需手动下载替换）")
+    if interactive:
+        try:
+            if not sys.stdin.isatty():
+                print("  [非交互环境] 未自动更新——可运行 update 子命令或菜单 4 手动更新")
+                return False
+            ans = input("  是否更新词典并重新应用汉化？[Y/n]: ").strip().lower()
+        except EOFError:
+            ans = "n"
+        if ans not in ("", "y", "yes"):
+            print("  已跳过更新。")
+            return False
+    try:
+        data = download_dict(info)
+    except Exception as e:
+        print(f"⚠ 更新失败（词典下载/校验）：{e}")
+        return False
+    p = os.path.join(here(), "润色词典.csv")
+    if os.path.exists(p):
+        shutil.copy2(p, os.path.join(here(), "润色词典.bak.csv"))
+    open(p, "wb").write(data)
+    print("  词典已更新（旧版备份为 润色词典.bak.csv），正在重新应用汉化…")
+    with _Tee(os.path.join(here(), "安装日志.txt")):
+        _do_install()
+    return True
+
+
 def cmd_install():
     with _Tee(os.path.join(here(), "安装日志.txt")):
         _do_install()
@@ -397,17 +477,22 @@ def _do_uninstall():
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         cmd = sys.argv[1]
-        {"install": cmd_install, "status": cmd_status, "uninstall": cmd_uninstall}.get(
+        {"install": cmd_install, "status": cmd_status, "uninstall": cmd_uninstall,
+         "update": lambda: do_update(interactive=sys.stdin.isatty())}.get(
             cmd, lambda: print(__doc__))()
     else:
-        # 双击运行（无参数）→ 交互菜单；非交互环境（管道）默认显示状态
+        # 启动即自动检查更新（网络失败如实提示后继续）；随后进入交互菜单
+        do_update(interactive=True)
+        print()
         print("==== Anymaker 简中汉化包 ====")
         print("  1) 安装 / 更新汉化")
         print("  2) 查看状态")
         print("  3) 卸载，还原官方文件")
+        print("  4) 检查汉化更新")
         print("  0) 退出")
         try:
-            choice = input("请选择 [1/2/3/0]: ").strip()
+            choice = input("请选择 [1/2/3/4/0]: ").strip()
         except EOFError:
             choice = "2"
-        {"1": cmd_install, "2": cmd_status, "3": cmd_uninstall}.get(choice, lambda: None)()
+        {"1": cmd_install, "2": cmd_status, "3": cmd_uninstall,
+         "4": lambda: do_update(interactive=True)}.get(choice, lambda: None)()
