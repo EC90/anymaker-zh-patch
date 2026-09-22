@@ -360,6 +360,19 @@ def cmd_uninstall():
 
 
 if __name__ == "__main__":
-    cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
-    {"install": cmd_install, "status": cmd_status, "uninstall": cmd_uninstall}.get(
-        cmd, lambda: print(__doc__))()
+    if len(sys.argv) > 1:
+        cmd = sys.argv[1]
+        {"install": cmd_install, "status": cmd_status, "uninstall": cmd_uninstall}.get(
+            cmd, lambda: print(__doc__))()
+    else:
+        # 双击运行（无参数）→ 交互菜单；非交互环境（管道）默认显示状态
+        print("==== Anymaker 简中汉化包 ====")
+        print("  1) 安装 / 更新汉化")
+        print("  2) 查看状态")
+        print("  3) 卸载，还原官方文件")
+        print("  0) 退出")
+        try:
+            choice = input("请选择 [1/2/3/0]: ").strip()
+        except EOFError:
+            choice = "2"
+        {"1": cmd_install, "2": cmd_status, "3": cmd_uninstall}.get(choice, lambda: None)()
