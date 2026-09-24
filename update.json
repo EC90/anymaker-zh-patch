@@ -1,9 +1,9 @@
 {
-  "version": "1.0.3",
-  "date": "2026-09-22",
-  "notes": "新增：启动自动检查更新 + 词典在线更新（SHA-256 校验）+ 菜单4手动检查",
+  "version": "1.3.2",
+  "date": "2026-09-25",
+  "notes": "第二轮润色：141 组重名区分（管道 I/L/T/X 型号注记、异径管修正、按尺寸数值注记）+ 武器原型命名（AK-107/L85A3/HK416/Kar98k/AWP/M1911/AUG A3/M249/FN MAG/S&W686 等，配件跟随枪名）+ 描述修复 329 条（弹链/高爆弹/口径点号/×乘号/数字单位紧贴/；→。）；新增官方汉化文本路线 / 润色后路线双路线选择（菜单 1 或 install official|polished）；词典 18→1536 行",
   "dict_url": "https://raw.githubusercontent.com/EC90/anymaker-zh-patch/main/%E6%B6%A6%E8%89%B2%E8%AF%8D%E5%85%B8.csv",
   "dict_mirror": "https://cdn.jsdelivr.net/gh/EC90/anymaker-zh-patch@main/%E6%B6%A6%E8%89%B2%E8%AF%8D%E5%85%B8.csv",
-  "dict_sha256": "89303ad80b85f3f83057f2fcf73cb686c11ba2532d10a9e50de147c134077ca8",
+  "dict_sha256": "048de423d7e1dd98d7639d6cb3cae20561353f6f8906ed41f7bc9162937eff06",
   "release_url": "https://github.com/EC90/anymaker-zh-patch/releases/latest"
 }
