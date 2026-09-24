@@ -3,14 +3,32 @@
   "app_id": "4435340",
   "game": "Anymaker (Steam Early Access, Geometa)",
   "repo": "https://github.com/EC90/anymaker-zh-patch",
-  "tested_builds": ["25422107", "25436400"],
+  "installer_version": "1.3.2",
+  "tested_builds": ["25422107", "25436400", "25480554", "25501161"],
+  "routes": {
+    "polished": {
+      "label": "润色后路线",
+      "default": true,
+      "command": "install polished",
+      "desc": "官方中文 + 社区润色与补差（界面短译、生物僵尸译名、润色词典 gcl/name/tsv）；界面最完整"
+    },
+    "official": {
+      "label": "官方汉化文本路线",
+      "default": false,
+      "command": "install official",
+      "desc": "严格只用游戏自带官方中文，不含任何社区译文；界面残留英文较多（F7 面板、超短词、生物与僵尸名）"
+    }
+  },
   "entry_script": "安装汉化.py",
   "entry_exe": "anymaker-zh-installer.exe",
   "commands": {
-    "install": "python 安装汉化.py install",
+    "install": "python 安装汉化.py install [official|polished]",
     "status": "python 安装汉化.py status",
-    "uninstall": "python 安装汉化.py uninstall"
+    "uninstall": "python 安装汉化.py uninstall",
+    "update": "python 安装汉化.py update"
   },
+  "routes_note": "省略路线参数时：有交互控制台会询问；无控制台按默认 polished。路线切换自动先还原再重装，无需手工 uninstall。",
+  "state_file": "安装状态.json",
   "requires": "Windows + 已安装 Anymaker；Python 3.8+（或使用 exe 免 Python）",
   "prereq_game_not_running": true,
   "rollback": ["uninstall 子命令", "Steam 验证文件完整性"],
