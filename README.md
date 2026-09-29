@@ -1,6 +1,6 @@
 # Anymaker 简中汉化包（anymaker-zh-patch）
 
-[![Release](https://img.shields.io/badge/release-v1.3.2--b25501161-blue)](../../releases)
+[![Release](https://img.shields.io/badge/release-v1.3.3--b25531960-blue)](../../releases)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 ![License](https://img.shields.io/badge/code-MIT-green)
 
