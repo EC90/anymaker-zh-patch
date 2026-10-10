@@ -1,7 +1,7 @@
 {
-  "version": "1.3.5",
-  "date": "2026-10-06",
-  "notes": "适配游戏 25725299（载具液体/浮力引擎更新）：gcl 全部 433 词条锚点存活、无新增界面文案；官方改 air_filter/tilt_sensor 两条组件描述并已同步官方中文；KNOWN_BUILDS 补 25725299。词典与 v1.3.4 完全一致（sha 不变），老用户无需换词典",
+  "version": "1.3.6",
+  "date": "2026-10-10",
+  "notes": "适配游戏 25826614（新增感染/疾病机制）：新增 5 条感染教程文案中 4 条官方译在字节预算内、1 条超 12B 已补社区短译（MANUAL 146 条）；6 只怪物新增音效字段与物理参数、inventory JSON 仅键序调整；词典与 v1.3.5 一致（sha 不变）；KNOWN_BUILDS 补 25826614",
   "dict_url": "https://raw.githubusercontent.com/EC90/anymaker-zh-patch/main/%E6%B6%A6%E8%89%B2%E8%AF%8D%E5%85%B8.csv",
   "dict_mirror": "https://cdn.jsdelivr.net/gh/EC90/anymaker-zh-patch@main/%E6%B6%A6%E8%89%B2%E8%AF%8D%E5%85%B8.csv",
   "dict_sha256": "048de423d7e1dd98d7639d6cb3cae20561353f6f8906ed41f7bc9162937eff06",

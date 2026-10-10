@@ -3,7 +3,7 @@
   "app_id": "4435340",
   "game": "Anymaker (Steam Early Access, Geometa)",
   "repo": "https://github.com/EC90/anymaker-zh-patch",
-  "installer_version": "1.3.5",
+  "installer_version": "1.3.6",
   "tested_builds": [
     "25422107",
     "25436400",
@@ -11,7 +11,8 @@
     "25501161",
     "25531960",
     "25609242",
-    "25725299"
+    "25725299",
+    "25826614"
   ],
   "routes": {
     "polished": {
